@@ -174,7 +174,7 @@ describe('Transaction API Tests (/api/transactions)', () => {
       expect(bobAcc.balance_paise).toBe(100000);   // ₹1,000.00
 
       // Verify transaction table entry
-      const tx = db.prepare('SELECT * FROM transactions WHERE transaction_type = "transfer" ORDER BY id DESC LIMIT 1').get();
+      const tx = db.prepare("SELECT * FROM transactions WHERE transaction_type = 'transfer' ORDER BY id DESC LIMIT 1").get();
       expect(tx).toBeDefined();
       expect(tx.source_account_id).toBe(customer1Account.id);
       expect(tx.destination_account_id).toBe(customer2Account.id);

@@ -249,6 +249,37 @@ Navigate to: **http://localhost:3000**
 
 ---
 
+## 🌐 Deploying on Render
+
+TrustVault can run as a Render Node web service. In Render, create a web service for this GitHub repository and use:
+
+| Setting | Value |
+|---------|-------|
+| Root directory | Repository root |
+| Build command | `npm ci` |
+| Start command | `npm start` |
+
+Set these environment variables in the Render service:
+
+| Variable | Value |
+|----------|-------|
+| `NODE_ENV` | `production` |
+| `SESSION_SECRET` | A newly generated, long random secret; do not reuse the example or commit it |
+| `DB_PATH` | `/var/data/trustvault.db` |
+| `SESSION_DIR` | `/var/data` |
+
+Generate a secret locally with `openssl rand -hex 32`, then enter the result directly in Render's environment settings. Do not commit it. Render sets `PORT` for the service; the application listens on that port and binds to `0.0.0.0`.
+
+### SQLite persistence
+
+The application creates/verifies the SQLite schema each time the server starts. It does not automatically seed users or transactions. The database path defaults to `data/trustvault.db`; the session store defaults to `data/sessions.db`.
+
+Render's service filesystem is ephemeral unless you attach a persistent disk. To preserve accounts, transactions, and sessions across restarts and deployments, attach a disk to the web service mounted at `/var/data`; the two environment variables above then put both SQLite files on that disk. Render persistent disks are available on paid web services. Without a persistent disk, user accounts, transactions, and sessions stored in SQLite may be lost when the service restarts or redeploys.
+
+Do not run `npm run db:seed` on a public deployment as-is. It creates accounts using fixed demo passwords that are documented in this repository, including an administrator login. A new deployment starts with an empty database (schema only); visitors can register simulated customer accounts, but there is no seeded administrator. The project is an academic simulation only and has no real banking or payment integrations.
+
+---
+
 ## 🔑 Demo Credentials
 
 | Role | Email | Password |
@@ -333,7 +364,7 @@ npm run db:reset
 ## 🔒 Security Notes
 
 - Passwords are hashed with bcrypt (cost factor 12)
-- Sessions are server-side (session ID only stored in cookie)
+- Sessions are server-side in SQLite (only the session ID is stored in the cookie)
 - All SQL queries use parameterized statements (no SQL injection)
 - Role-based access control on all API endpoints
 - Input validation on both frontend and backend
@@ -345,10 +376,10 @@ npm run db:reset
 
 1. **No email verification** — This is an academic project with no email server
 2. **No password reset** — Contact admin to reset password in demo environment
-3. **Memory session store** — Sessions are stored in SQLite file; in production use Redis
+3. **SQLite persistence** — On hosts with ephemeral filesystems, attach persistent storage or sessions and application data can be lost on restart or redeploy
 4. **No real banking** — All operations are simulated; no real money involved
 5. **Single server** — Designed for local academic demonstration only
-6. **No HTTPS** — Add TLS/SSL certificates before any real deployment
+6. **Public demo credentials** — The optional seed script uses fixed demo passwords; do not seed a publicly accessible deployment with those credentials
 
 ---
 

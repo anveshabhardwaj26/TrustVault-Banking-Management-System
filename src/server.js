@@ -7,7 +7,7 @@ initDatabase();
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`[TrustVault] Server running smoothly on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[TrustVault] Server listening on port ${PORT}`);
   console.log(`[TrustVault] Environment: ${process.env.NODE_ENV || 'development'}`);
 });
