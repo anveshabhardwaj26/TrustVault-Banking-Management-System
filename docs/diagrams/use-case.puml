@@ -1,0 +1,87 @@
+@startuml
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam handwritten false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+title TrustVault Banking Management System — Use Case Diagram
+
+left to right direction
+
+actor "Customer" as customer << Primary >>
+actor "Bank Employee" as employee << Staff >>
+actor "Bank Admin / Manager" as admin << Supervisor >>
+
+rectangle "TrustVault Banking System" {
+    ' Core Access & Identity
+    usecase "UC-01: Register Account" as UC01
+    usecase "UC-02: Login" as UC02
+    usecase "UC-03: Logout" as UC03
+
+    ' Customer Financial Services
+    usecase "UC-04: Check Balance & Details" as UC04
+    usecase "UC-05: Deposit Money" as UC05
+    usecase "UC-06: Transfer Money" as UC06
+    usecase "UC-07: Withdraw Money" as UC07
+    usecase "UC-08: View Transaction History" as UC08
+
+    ' Loan Facility Services
+    usecase "UC-09: Apply for Loan" as UC09
+    usecase "UC-10: View Loan Status" as UC10
+
+    ' Staff & Administrative Operations
+    usecase "UC-11: Manage Customer Accounts" as UC11
+    usecase "Process / View Transactions" as UCTrans
+    usecase "Review Loan Applications" as UCRevLoan
+    usecase "Approve / Reject Loan" as UCAppLoan
+    usecase "Generate Reports & Analytics" as UCRep
+}
+
+' Customer Associations
+customer --> UC01
+customer --> UC02
+customer --> UC03
+customer --> UC04
+customer --> UC05
+customer --> UC06
+customer --> UC07
+customer --> UC08
+customer --> UC09
+customer --> UC10
+
+' Bank Employee Associations
+employee --> UC02
+employee --> UC03
+employee --> UC08
+employee --> UC11
+employee --> UCTrans
+employee --> UCRevLoan
+
+' Bank Admin Associations
+admin --> UC02
+admin --> UC03
+admin --> UC11
+admin --> UCTrans
+admin --> UCRevLoan
+admin --> UCAppLoan
+admin --> UCRep
+
+' Include Relationships: Operations requiring prior authentication
+UC04 ..> UC02 : <<include>>
+UC05 ..> UC02 : <<include>>
+UC06 ..> UC02 : <<include>>
+UC07 ..> UC02 : <<include>>
+UC08 ..> UC02 : <<include>>
+UC09 ..> UC02 : <<include>>
+UC10 ..> UC02 : <<include>>
+UC11 ..> UC02 : <<include>>
+UCTrans ..> UC02 : <<include>>
+UCRevLoan ..> UC02 : <<include>>
+UCAppLoan ..> UC02 : <<include>>
+UCRep ..> UC02 : <<include>>
+UC03 ..> UC02 : <<include>>
+
+@enduml

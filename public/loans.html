@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply for a Loan | TrustVault</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Secure Banking</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Account Overview</li>
+        <li class="sidebar-item">
+          <a href="/dashboard.html" class="sidebar-link" data-page="dashboard">
+            <span class="icon">📊</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-heading">Fund Operations</li>
+        <li class="sidebar-item">
+          <a href="/deposit.html" class="sidebar-link" data-page="deposit">
+            <span class="icon">📥</span> Deposit Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/withdraw.html" class="sidebar-link" data-page="withdraw">
+            <span class="icon">📤</span> Withdraw Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transfer.html" class="sidebar-link" data-page="transfer">
+            <span class="icon">🔄</span> Fund Transfer
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transactions.html" class="sidebar-link" data-page="transactions">
+            <span class="icon">📜</span> Transactions
+          </a>
+        </li>
+        <li class="sidebar-heading">Lending</li>
+        <li class="sidebar-item">
+          <a href="/loans.html" class="sidebar-link active" data-page="loans">
+            <span class="icon">💳</span> Apply for Loan
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/loan-status.html" class="sidebar-link" data-page="loan-status">
+            <span class="icon">📑</span> Loan Status
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">Loan Application</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar">C</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">Customer</span>
+              <span class="user-role user-role-display">Account Holder</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Apply for a New Loan</h1>
+            <p class="page-subtitle">Instant processing, flexible tenures, and competitive interest rates</p>
+          </div>
+          <a href="/loan-status.html" class="btn btn-outline btn-sm">View My Applications →</a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start;" id="loan-application-grid">
+          <!-- Application Form Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Loan Application Form</h3>
+            </div>
+            <div class="card-body">
+              <div id="loan-error-box" class="inline-alert inline-alert-error" style="display: none;">
+                <span id="loan-error-msg"></span>
+              </div>
+
+              <form id="loan-form" novalidate>
+                <div class="form-group">
+                  <label for="loanType" class="form-label">Loan Category <span class="required">*</span></label>
+                  <select id="loanType" name="loanType" class="form-select" required>
+                    <option value="Home Loan" data-rate="8.5">Home Loan (8.50% p.a.)</option>
+                    <option value="Personal Loan" data-rate="11.5" selected>Personal Loan (11.50% p.a.)</option>
+                    <option value="Education Loan" data-rate="9.0">Education Loan (9.00% p.a.)</option>
+                    <option value="Vehicle Loan" data-rate="9.5">Vehicle Loan (9.50% p.a.)</option>
+                    <option value="Business Loan" data-rate="13.0">Business Loan (13.00% p.a.)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="amount" class="form-label">Requested Loan Amount (₹) <span class="required">*</span></label>
+                  <div class="input-group">
+                    <span class="input-prefix">₹</span>
+                    <input 
+                      type="number" 
+                      id="amount" 
+                      name="amount" 
+                      class="form-control" 
+                      placeholder="e.g. 200000" 
+                      min="10000" 
+                      max="10000000" 
+                      step="5000" 
+                      value="100000"
+                      required
+                    >
+                  </div>
+                  <div class="form-error" id="amount-error">Please enter an amount between ₹10,000 and ₹1,00,00,000.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="tenure" class="form-label">Tenure (Months) <span class="required">*</span></label>
+                  <select id="tenure" name="tenure" class="form-select" required>
+                    <option value="12">12 Months (1 Year)</option>
+                    <option value="24">24 Months (2 Years)</option>
+                    <option value="36" selected>36 Months (3 Years)</option>
+                    <option value="48">48 Months (4 Years)</option>
+                    <option value="60">60 Months (5 Years)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="purpose" class="form-label">Purpose / Notes <span class="required">*</span></label>
+                  <textarea 
+                    id="purpose" 
+                    name="purpose" 
+                    class="form-control" 
+                    rows="3" 
+                    placeholder="Briefly state the reason for this loan (e.g. Home renovation, college fees, medical emergency)"
+                    required
+                  ></textarea>
+                  <div class="form-error" id="purpose-error">Please describe the purpose of the loan.</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-loan-btn">
+                  Submit Loan Application
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Real-Time EMI Calculator Panel -->
+          <div class="card" style="position: sticky; top: 85px;">
+            <div class="card-header">
+              <h3 class="card-title">Estimated Repayment</h3>
+            </div>
+            <div class="card-body">
+              <div style="font-size: 0.82rem; text-transform: uppercase; color: var(--text-light); font-weight: 600;">Monthly EMI</div>
+              <div style="font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 16px;" id="calc-emi">
+                ₹3,298
+              </div>
+
+              <div class="summary-box" style="padding: 12px; margin-bottom: 14px;">
+                <div class="summary-row">
+                  <span class="summary-label">Principal:</span>
+                  <span class="summary-value" id="calc-principal">₹1,00,000.00</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Interest Rate:</span>
+                  <span class="summary-value" id="calc-rate">11.5% p.a.</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Total Interest:</span>
+                  <span class="summary-value" id="calc-total-interest">₹18,728.00</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Total Amount Payable:</span>
+                  <span class="summary-value" style="font-weight: 700;" id="calc-total-payable">₹1,18,728.00</span>
+                </div>
+              </div>
+
+              <p style="font-size: 0.78rem; color: var(--text-light); line-height: 1.4; margin: 0;">
+                *EMI is indicative and subject to final credit assessment and verification by the bank administration.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Existing Applications Table -->
+        <div class="card" style="margin-top: 30px;">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">My Recent Applications</h3>
+              <p class="card-subtitle">Active and past loan requests submitted by you</p>
+            </div>
+            <a href="/loan-status.html" class="btn btn-outline btn-sm">Full Status Board →</a>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Loan Type</th>
+                    <th>Requested Amount</th>
+                    <th>Tenure</th>
+                    <th>Applied Date</th>
+                    <th>Status</th>
+                    <th>Decision Note</th>
+                  </tr>
+                </thead>
+                <tbody id="my-loans-table-body">
+                  <tr>
+                    <td colspan="6" style="text-align: center; padding: 30px;">
+                      <div class="spinner spinner-sm"></div> Loading your applications...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>© 2026 TrustVault Banking System.</div>
+        <div>Customer Support: 1800-TRUST-VAULT</div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/loans.js"></script>
+</body>
+</html>

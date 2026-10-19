@@ -1,0 +1,90 @@
+@startuml
+autonumber "<b>[00]</b>"
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+skinparam sequenceMessageAlign center
+
+title TrustVault — Peer-to-Peer Fund Transfer (Sequence Diagram)
+
+actor "Customer" as Customer
+boundary "Transfer Page\n(transfer.html / JS)" as Page
+control "Express API Router\n(src/routes/transactions.js)" as Router
+control "Auth Middleware\n(src/middleware/auth.js)" as Auth
+control "Transfer Service\n(src/services/transactionService.js)" as Service
+entity "Account Repository\n(src/repositories/accountRepository.js)" as AccountRepo
+entity "Transaction Repository\n(src/repositories/transactionRepository.js)" as TxnRepo
+database "SQLite Database\n(data/trustvault.db)" as DB
+
+Customer -> Page: 1. Inputs Recipient Account ("TV10000002"), Amount (₹ 2,500), Remark
+Page -> Router: 2. POST /api/transactions/transfer {recipientAccount, amount, remark}
+
+Router -> Auth: 3. Verify Session & Cookie (connect.sid)
+alt 3a. Invalid / Expired Session
+    Auth --> Router: 401 Unauthorized
+    Router --> Page: 401 JSON {error: "Session expired"}
+    Page --> Customer: Render login redirect alert
+else 3b. Valid Session
+    Auth -> Router: Validated session (req.session.userId)
+    Router -> Service: 4. executeTransfer(userId, recipientAccount, amount, remark)
+
+    Service -> AccountRepo: 5. getAccountByUserId(userId)
+    AccountRepo -> DB: SELECT * FROM accounts WHERE user_id = ?
+    DB --> AccountRepo: senderAccount record
+    AccountRepo --> Service: return senderAccount (TV10000001, Balance: ₹10,000)
+
+    Service -> Service: 6. Check Ownership & Self-Transfer (TV10000001 == TV10000002?)
+    alt Self-Transfer Attempt
+        Service --> Router: Throw ValidationError("Cannot transfer to own account")
+        Router --> Page: 400 Bad Request
+        Page --> Customer: Render "Cannot transfer to own account"
+    end
+
+    Service -> AccountRepo: 7. getAccountByNumber("TV10000002")
+    AccountRepo -> DB: SELECT * FROM accounts WHERE account_number = ?
+    DB --> AccountRepo: recipientAccount record
+    AccountRepo --> Service: return recipientAccount (Status: 'ACTIVE')
+
+    alt Recipient Not Found / Inactive
+        Service --> Router: Throw NotFoundError("Beneficiary account not found or inactive")
+        Router --> Page: 404 Not Found
+        Page --> Customer: Render "Beneficiary account not found"
+    end
+
+    Service -> Service: 8. Check Balance (sender.balance >= amountPaise)
+    alt Insufficient Balance
+        Service --> Router: Throw BusinessRuleError("Insufficient funds")
+        Router --> Page: 400 Bad Request
+        Page --> Customer: Render "Insufficient available balance"
+    else Sufficient Balance
+        Service -> DB: 9. db.transaction(() => { ... }) [BEGIN IMMEDIATE]
+        activate DB
+
+        Service -> AccountRepo: 10. decrementBalance(senderAccountId, amountPaise)
+        AccountRepo -> DB: UPDATE accounts SET balance = balance - 250000 WHERE id = 1
+
+        Service -> AccountRepo: 11. incrementBalance(recipientAccountId, amountPaise)
+        AccountRepo -> DB: UPDATE accounts SET balance = balance + 250000 WHERE id = 2
+
+        Service -> TxnRepo: 12. recordTransaction(refId, senderId, recipientId, amount, status)
+        TxnRepo -> DB: INSERT INTO transactions (reference_id, sender_id, recipient_id, amount, ...) VALUES (...)
+
+        alt Database Success
+            DB --> Service: 13. COMMIT Successful
+            deactivate DB
+            Service --> Router: return { success: true, refId: "TXN-TRF-001", newBalance: 750000 }
+            Router --> Page: 200 OK JSON { success: true, newBalanceRupees: "7500.00" }
+            Page --> Customer: Display Success Modal & Updated Balance (₹ 7,500.00)
+        else Database SQL Error / Lock Conflict
+            activate DB
+            DB --> Service: ROLLBACK (Balances fully restored)
+            deactivate DB
+            Service --> Router: Throw DatabaseError("Transaction aborted")
+            Router --> Page: 500 Internal Server Error
+            Page --> Customer: Display "Transaction Failed - No funds deducted"
+        end
+    end
+end
+
+@enduml

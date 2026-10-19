@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fund Transfer | TrustVault</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Secure Banking</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Account Overview</li>
+        <li class="sidebar-item">
+          <a href="/dashboard.html" class="sidebar-link" data-page="dashboard">
+            <span class="icon">📊</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-heading">Fund Operations</li>
+        <li class="sidebar-item">
+          <a href="/deposit.html" class="sidebar-link" data-page="deposit">
+            <span class="icon">📥</span> Deposit Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/withdraw.html" class="sidebar-link" data-page="withdraw">
+            <span class="icon">📤</span> Withdraw Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transfer.html" class="sidebar-link active" data-page="transfer">
+            <span class="icon">🔄</span> Fund Transfer
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transactions.html" class="sidebar-link" data-page="transactions">
+            <span class="icon">📜</span> Transactions
+          </a>
+        </li>
+        <li class="sidebar-heading">Lending</li>
+        <li class="sidebar-item">
+          <a href="/loans.html" class="sidebar-link" data-page="loans">
+            <span class="icon">💳</span> Apply for Loan
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/loan-status.html" class="sidebar-link" data-page="loan-status">
+            <span class="icon">📑</span> Loan Status
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">Fund Transfer</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar">C</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">Customer</span>
+              <span class="user-role user-role-display">Account Holder</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Instant Fund Transfer</h1>
+            <p class="page-subtitle">Transfer funds seamlessly to any TrustVault bank account</p>
+          </div>
+          <a href="/dashboard.html" class="btn btn-outline btn-sm">← Back to Dashboard</a>
+        </div>
+
+        <div style="max-width: 680px; margin: 0 auto;">
+          <!-- Balance Summary Card -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; font-weight: 600;">Available For Transfer</div>
+                <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary);" id="current-balance">₹0.00</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.82rem; color: var(--text-light);">From Account</div>
+                <div style="font-weight: 600; color: var(--text-dark);" id="account-number-display">••••••••••••</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stepper UI -->
+          <div class="stepper">
+            <div class="step-item active" id="step-nav-1">
+              <div class="step-circle">1</div>
+              <div class="step-label">Enter Details</div>
+            </div>
+            <div class="step-item" id="step-nav-2">
+              <div class="step-circle">2</div>
+              <div class="step-label">Review Transfer</div>
+            </div>
+            <div class="step-item" id="step-nav-3">
+              <div class="step-circle">3</div>
+              <div class="step-label">Confirmation</div>
+            </div>
+          </div>
+
+          <!-- Alert box for errors -->
+          <div id="transfer-error-box" class="inline-alert inline-alert-error" style="display: none;">
+            <span id="transfer-error-msg"></span>
+          </div>
+
+          <!-- STEP 1: Details Form -->
+          <div class="card" id="step-1-card">
+            <div class="card-header">
+              <h3 class="card-title">1. Beneficiary & Transfer Details</h3>
+            </div>
+            <div class="card-body">
+              <form id="transfer-form-step1" novalidate>
+                <div class="form-group">
+                  <label for="toAccount" class="form-label">Beneficiary Account Number <span class="required">*</span></label>
+                  <div class="input-group">
+                    <input 
+                      type="text" 
+                      id="toAccount" 
+                      name="toAccount" 
+                      class="form-control" 
+                      placeholder="Enter beneficiary account number" 
+                      required
+                    >
+                    <button type="button" class="btn btn-outline" id="lookup-btn" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                      Verify Account
+                    </button>
+                  </div>
+                  <div class="form-error" id="toAccount-error">Please enter a valid beneficiary account number.</div>
+                  <div id="beneficiary-lookup-status" style="font-size: 0.85rem; margin-top: 6px;"></div>
+                </div>
+
+                <div class="form-group">
+                  <label for="beneficiaryName" class="form-label">Beneficiary Account Holder Name</label>
+                  <input 
+                    type="text" 
+                    id="beneficiaryName" 
+                    name="beneficiaryName" 
+                    class="form-control" 
+                    placeholder="Will auto-populate after verification" 
+                    readonly
+                    style="background-color: #f8fafc;"
+                  >
+                  <div class="form-hint">Click "Verify Account" or tab away to verify the recipient name.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="amount" class="form-label">Transfer Amount (₹) <span class="required">*</span></label>
+                  <div class="input-group">
+                    <span class="input-prefix">₹</span>
+                    <input 
+                      type="number" 
+                      id="amount" 
+                      name="amount" 
+                      class="form-control" 
+                      placeholder="e.g. 5000" 
+                      min="1" 
+                      step="any"
+                      required
+                    >
+                  </div>
+                  <div class="form-error" id="amount-error">Please enter a valid amount within your available balance.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="description" class="form-label">Remarks / Purpose (Optional)</label>
+                  <input 
+                    type="text" 
+                    id="description" 
+                    name="description" 
+                    class="form-control" 
+                    placeholder="e.g. Rent payment, Family support"
+                    maxlength="100"
+                  >
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 28px;">
+                  <button type="submit" class="btn btn-primary btn-lg" style="flex: 2;" id="review-transfer-btn">
+                    Review Transfer →
+                  </button>
+                  <a href="/dashboard.html" class="btn btn-outline btn-lg" style="flex: 1; text-align: center;">
+                    Cancel
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- STEP 2: Review + Confirm Card -->
+          <div class="card" id="step-2-card" style="display: none;">
+            <div class="card-header">
+              <h3 class="card-title">2. Review Transfer Summary</h3>
+            </div>
+            <div class="card-body">
+              <p style="color: var(--text-light); margin-bottom: 20px;">
+                Please verify all the transfer details carefully before authorizing the transaction.
+              </p>
+
+              <div class="summary-box">
+                <div class="summary-row">
+                  <span class="summary-label">Transfer Amount:</span>
+                  <span class="summary-value highlight" id="review-amount">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Debited From:</span>
+                  <span class="summary-value" id="review-from-acc">••••••••</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Beneficiary Account:</span>
+                  <span class="summary-value" id="review-to-acc">—</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Beneficiary Name:</span>
+                  <span class="summary-value" id="review-to-name">—</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Purpose / Remarks:</span>
+                  <span class="summary-value" id="review-desc">General Transfer</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Transfer Fee:</span>
+                  <span class="summary-value" style="color: var(--success); font-weight: 600;">₹0.00 (Free IMPS/NEFT)</span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button type="button" class="btn btn-outline btn-lg" id="back-to-step1-btn" style="flex: 1;">
+                  ← Go Back
+                </button>
+                <button type="button" class="btn btn-accent btn-lg" id="confirm-transfer-btn" style="flex: 2;">
+                  Confirm & Transfer Now
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Success Receipt Card -->
+          <div class="card" id="step-3-card" style="display: none;">
+            <div class="card-body" style="text-align: center; padding: 40px 24px;">
+              <div style="width: 60px; height: 60px; background-color: var(--success-bg); color: var(--success); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 16px;">
+                ✓
+              </div>
+              <h2 style="color: var(--success); margin-bottom: 8px;">Transfer Successful!</h2>
+              <p style="color: var(--text-light); margin-bottom: 24px;">Funds have been transferred to the beneficiary account.</p>
+
+              <div class="summary-box" style="text-align: left; max-width: 460px; margin: 0 auto 24px;">
+                <div class="summary-row">
+                  <span class="summary-label">Transaction Reference:</span>
+                  <span class="summary-value" id="receipt-ref">—</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Amount Transferred:</span>
+                  <span class="summary-value highlight" id="receipt-amount">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Beneficiary:</span>
+                  <span class="summary-value" id="receipt-beneficiary">—</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Remaining Balance:</span>
+                  <span class="summary-value" id="receipt-balance">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Date & Time:</span>
+                  <span class="summary-value" id="receipt-time">—</span>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: center; gap: 12px;">
+                <button type="button" class="btn btn-outline" id="new-transfer-btn">Send Another Transfer</button>
+                <a href="/dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>© 2026 TrustVault Banking System.</div>
+        <div>Customer Support: 1800-TRUST-VAULT</div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/transfer.js"></script>
+</body>
+</html>

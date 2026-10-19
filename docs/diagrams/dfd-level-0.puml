@@ -1,0 +1,37 @@
+@startuml
+skinparam roundcorner 12
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+skinparam rectangle {
+    BackgroundColor #E8F0FE
+    BorderColor #1A73E8
+    RoundCorner 8
+}
+
+skinparam component {
+    BackgroundColor #E6F4EA
+    BorderColor #137333
+    RoundCorner 25
+}
+
+title Context Data Flow Diagram (DFD Level 0) — TrustVault
+
+rectangle "External Entity:\n<b>Customer</b>\n(Retail User)" as Customer
+
+component "<b>Process 0.0</b>\n\n<b>TrustVault Banking System</b>\n\n(Core Banking Engine)" as System
+
+rectangle "External Entity:\n<b>Bank Manager / Admin</b>\n(Operational Staff & Management)" as Admin
+
+' Data Flows between Customer and System
+Customer --> System : 1. Registration Info & Credentials\n2. Deposit & Withdrawal Instructions\n3. Fund Remittance Data (Beneficiary, ₹)\n4. Loan Application Information
+
+System --> Customer : 5. Account Details & Balance Notifications\n6. Transaction Confirmations & Receipts\n7. Loan Adjudication Verdict & Status
+
+' Data Flows between Bank Manager and System
+Admin --> System : 8. Staff Authentication Credentials\n9. Account State Changes (Freeze/Unfreeze)\n10. Loan Decisioning (Approve/Reject)\n11. System Configuration & Audit Queries
+
+System --> Admin : 12. Institutional Metrics & Dashboard KPIs\n13. Consolidated Transaction Ledgers\n14. System Audit Logs & Operational Reports
+
+@enduml

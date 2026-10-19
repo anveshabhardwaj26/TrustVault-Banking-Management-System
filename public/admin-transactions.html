@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Transactions | TrustVault Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Admin Console</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Overview</li>
+        <li class="sidebar-item">
+          <a href="/admin.html" class="sidebar-link" data-page="admin-dashboard">
+            <span class="icon">📊</span> Admin Overview
+          </a>
+        </li>
+        <li class="sidebar-heading">Management</li>
+        <li class="sidebar-item">
+          <a href="/admin-customers.html" class="sidebar-link" data-page="admin-customers">
+            <span class="icon">👥</span> Customer Accounts
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin-transactions.html" class="sidebar-link active" data-page="admin-transactions">
+            <span class="icon">💳</span> All Transactions
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin-loans.html" class="sidebar-link" data-page="admin-loans">
+            <span class="icon">📑</span> Loan Approvals
+          </a>
+        </li>
+        <li class="sidebar-heading">Intelligence</li>
+        <li class="sidebar-item">
+          <a href="/admin-reports.html" class="sidebar-link" data-page="admin-reports">
+            <span class="icon">📈</span> Financial Reports
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">Global Transaction Audit Ledger</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar" style="background-color: var(--accent);">A</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">System Administrator</span>
+              <span class="user-role user-role-display">Super Admin</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Complete Banking Transaction Log</h1>
+            <p class="page-subtitle">Examine all money flow across the platform for compliance and audit</p>
+          </div>
+          <button type="button" class="btn btn-outline" id="admin-export-txns-btn">
+            📥 Export All to CSV
+          </button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="admin-filter-type" style="font-weight: 600; font-size: 0.85rem;">Type:</label>
+            <select id="admin-filter-type" class="form-select" style="width: auto;">
+              <option value="all">All Types</option>
+              <option value="deposit">Deposits</option>
+              <option value="withdrawal">Withdrawals</option>
+              <option value="transfer">Transfers</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="admin-filter-start" style="font-weight: 600; font-size: 0.85rem;">From:</label>
+            <input type="date" id="admin-filter-start" class="form-control" style="width: auto;">
+
+            <label for="admin-filter-end" style="font-weight: 600; font-size: 0.85rem;">To:</label>
+            <input type="date" id="admin-filter-end" class="form-control" style="width: auto;">
+
+            <button type="button" class="btn btn-primary btn-sm" id="admin-apply-tx-filter">Filter</button>
+            <button type="button" class="btn btn-outline btn-sm" id="admin-reset-tx-filter">Reset</button>
+          </div>
+        </div>
+
+        <!-- Transactions Table Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">All Platform Transactions</h3>
+            <span id="admin-tx-count" style="font-size: 0.85rem; color: var(--text-light);">Loading transactions...</span>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Ref #</th>
+                    <th>Date & Time</th>
+                    <th>Source Account</th>
+                    <th>Beneficiary Account</th>
+                    <th>Type</th>
+                    <th style="text-align: right;">Amount</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-tx-tbody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px;">
+                      <div class="spinner spinner-sm"></div> Fetching transactions...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.85rem; color: var(--text-light);" id="admin-tx-pagination-info">
+              Showing page 1
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline btn-sm" id="admin-tx-prev" disabled>← Previous</button>
+              <button class="btn btn-outline btn-sm" id="admin-tx-next" disabled>Next →</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>TrustVault Core Banking Administration Console.</div>
+        <div>Confidential Audit Ledger</div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

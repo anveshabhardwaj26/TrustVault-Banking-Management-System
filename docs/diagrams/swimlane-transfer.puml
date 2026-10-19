@@ -1,0 +1,76 @@
+@startuml
+skinparam roundcorner 10
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+title TrustVault — Fund Transfer Swimlane Process Diagram
+
+|Customer|
+start
+:Open Transfer Portal;
+:Fill Recipient Account Number, Amount (₹), and Notes;
+:Submit Transfer Form;
+
+|Banking System (Express API)|
+:Intercept Request at Router;
+:Auth Middleware Validates Session & Role;
+:Extract Sender User ID from Session Store;
+:Validate Input Constraints (Syntax, Limits);
+
+|Database (SQLite)|
+:Query Sender Account Status & Balance;
+|Banking System (Express API)|
+:Verify Sender is Active;
+
+if (Sender Valid?) then (no)
+    :Return 403 Forbidden;
+    |Customer|
+    :Show Account Inactive Error;
+    stop
+else (yes)
+endif
+
+|Database (SQLite)|
+:Lookup Recipient Account by TV Number;
+|Banking System (Express API)|
+:Check Recipient Exists and is Active;
+:Check Sender != Recipient (Self-Transfer);
+:Verify Sender Balance >= Transfer Amount;
+
+if (All Business Rules Pass?) then (no)
+    :Return 400 Bad Request (Rule Violation);
+    |Customer|
+    :Display Specific Validation Error;
+    stop
+else (yes)
+endif
+
+:Convert Amount from Rupees to Integer Paise;
+
+|Database (SQLite)|
+:BEGIN IMMEDIATE TRANSACTION;
+:Execute UPDATE accounts SET balance = balance - :amount WHERE id = :senderId;
+:Execute UPDATE accounts SET balance = balance + :amount WHERE id = :recipientId;
+:Execute INSERT INTO transactions (reference_id, sender_id, recipient_id, amount, status, ...);
+
+if (All DB Statements Executed Without Error?) then (yes)
+    :COMMIT TRANSACTION;
+    |Banking System (Express API)|
+    :Build JSON Success Payload (Reference ID, Timestamp, New Balance);
+    :Return 200 OK Response;
+    |Customer|
+    :Render Transfer Confirmation & Updated Balance;
+    stop
+else (no)
+    |Database (SQLite)|
+    :ROLLBACK TRANSACTION (Restores balances to original state);
+    |Banking System (Express API)|
+    :Log Transaction Rollback Event;
+    :Return 500 Internal Server Error;
+    |Customer|
+    :Display "System Error - Transfer Cancelled" Alert;
+    stop
+endif
+
+@enduml

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Status & History | TrustVault</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Secure Banking</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Account Overview</li>
+        <li class="sidebar-item">
+          <a href="/dashboard.html" class="sidebar-link" data-page="dashboard">
+            <span class="icon">📊</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-heading">Fund Operations</li>
+        <li class="sidebar-item">
+          <a href="/deposit.html" class="sidebar-link" data-page="deposit">
+            <span class="icon">📥</span> Deposit Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/withdraw.html" class="sidebar-link" data-page="withdraw">
+            <span class="icon">📤</span> Withdraw Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transfer.html" class="sidebar-link" data-page="transfer">
+            <span class="icon">🔄</span> Fund Transfer
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transactions.html" class="sidebar-link" data-page="transactions">
+            <span class="icon">📜</span> Transactions
+          </a>
+        </li>
+        <li class="sidebar-heading">Lending</li>
+        <li class="sidebar-item">
+          <a href="/loans.html" class="sidebar-link" data-page="loans">
+            <span class="icon">💳</span> Apply for Loan
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/loan-status.html" class="sidebar-link active" data-page="loan-status">
+            <span class="icon">📑</span> Loan Status
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">My Loan Status</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar">C</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">Customer</span>
+              <span class="user-role user-role-display">Account Holder</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Loan Applications & Approvals</h1>
+            <p class="page-subtitle">Track the evaluation status and decisions on all your loan submissions</p>
+          </div>
+          <a href="/loans.html" class="btn btn-primary btn-sm">+ Apply for New Loan</a>
+        </div>
+
+        <!-- Loan Cards Grid Container -->
+        <div id="loan-cards-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+            <div class="spinner spinner-sm"></div> Fetching your loan applications...
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>© 2026 TrustVault Banking System.</div>
+        <div>Customer Support: 1800-TRUST-VAULT</div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/loans.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+@startuml
+skinparam roundcorner 10
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam rectangle {
+    BackgroundColor #E8F0FE
+    BorderColor #1A73E8
+}
+
+skinparam component {
+    BackgroundColor #E8EAED
+    BorderColor #3C4043
+    RoundCorner 18
+}
+
+skinparam database {
+    BackgroundColor #FCE8E6
+    BorderColor #C5221F
+}
+
+title Data Flow Diagram Level 2 — Decomposition of Process 3.0 (Manage Transactions)
+
+rectangle "External Entity:\n<b>Customer</b>" as Customer
+
+' Sub-processes of 3.0
+component "<b>3.1</b>\nReceive Transaction\nRequest" as P31
+component "<b>3.2</b>\nValidate User &\nAccount Status" as P32
+component "<b>3.3</b>\nValidate Transaction\nDetails & Limits" as P33
+component "<b>3.4</b>\nCheck Available\nBalance" as P34
+component "<b>3.5</b>\nProcess Transaction\n(Transfer / Deposit / Withdraw)" as P35
+component "<b>3.6</b>\nUpdate Account\nBalance (Atomic)" as P36
+component "<b>3.7</b>\nRecord Transaction\nAudit Row" as P37
+component "<b>3.8</b>\nReturn Transaction\nStatus & Receipt" as P38
+
+' Data Stores
+database "<b>D2: Account Data</b>\n(accounts table)" as D2
+database "<b>D3: Transaction Data</b>\n(transactions table)" as D3
+
+' Main Flows
+Customer --> P31 : 1. Submit Transaction Form (Type, Amount, Beneficiary)
+P31 --> P32 : 2. Forward Payload & User Session ID
+
+' 3.2 Validation
+P32 <--> D2 : 3. Lookup Sender / Beneficiary Account Status
+P32 --> P38 : [Alt Flow 3.2a: Account Inactive or Beneficiary Missing] -> Return Error
+P32 --> P33 : 4. Account Verified (Status = 'ACTIVE')
+
+' 3.3 Limits Validation
+P33 --> P38 : [Alt Flow 3.3a: Self-Transfer / Limit Exceeded] -> Return Error
+P33 --> P34 : 5. Parameters Verified (Rupees converted to paise)
+
+' 3.4 Balance Check
+P34 <--> D2 : 6. Read Sender Available Balance in Paise
+P34 --> P38 : [Alt Flow 3.4a: Balance < Amount] -> Return Insufficient Funds Error
+P34 --> P35 : 7. Balance Verified (Sufficient Funds Confirmed)
+
+' 3.5 & 3.6 Execution
+P35 --> P36 : 8. Dispatch Atomic DB Transaction Request
+P36 --> D2 : 9. Execute Balance Debit & Credit Updates
+P36 --> P37 : 10. Balances Updated (New balance in paise)
+
+' 3.7 Persistence
+P37 --> D3 : 11. Write Immutable Transaction Record (Status: SUCCESS, refId)
+P37 --> P38 : 12. Transaction Committed Successfully
+
+' 3.8 Output
+P38 --> Customer : 13. Render HTTP Response (Receipt / Debit Advice / Error Modal)
+
+@enduml

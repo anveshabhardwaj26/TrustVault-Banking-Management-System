@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | TrustVault</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Admin Console</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Overview</li>
+        <li class="sidebar-item">
+          <a href="/admin.html" class="sidebar-link active" data-page="admin-dashboard">
+            <span class="icon">📊</span> Admin Overview
+          </a>
+        </li>
+        <li class="sidebar-heading">Management</li>
+        <li class="sidebar-item">
+          <a href="/admin-customers.html" class="sidebar-link" data-page="admin-customers">
+            <span class="icon">👥</span> Customer Accounts
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin-transactions.html" class="sidebar-link" data-page="admin-transactions">
+            <span class="icon">💳</span> All Transactions
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin-loans.html" class="sidebar-link" data-page="admin-loans">
+            <span class="icon">📑</span> Loan Approvals
+          </a>
+        </li>
+        <li class="sidebar-heading">Intelligence</li>
+        <li class="sidebar-item">
+          <a href="/admin-reports.html" class="sidebar-link" data-page="admin-reports">
+            <span class="icon">📈</span> Financial Reports
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">Admin Panel | TrustVault</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar" style="background-color: var(--accent);">A</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">System Administrator</span>
+              <span class="user-role user-role-display">Super Admin</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">System Overview</h1>
+            <p class="page-subtitle">Platform health, core banking indicators, and queue alerts</p>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-light);" id="admin-time-stamp">
+            Last Updated: Just now
+          </div>
+        </div>
+
+        <!-- Stat Cards Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon primary">👥</div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-total-customers">0</div>
+              <div class="stat-label">Total Customers</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon success">🏦</div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-active-accounts">0</div>
+              <div class="stat-label">Active Accounts</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon accent">💳</div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-total-transactions">0</div>
+              <div class="stat-label">Total Transactions</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon warning">⏳</div>
+            <div class="stat-content">
+              <div class="stat-value" id="stat-pending-loans">0</div>
+              <div class="stat-label">Pending Loan Reviews</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Links Grid -->
+        <h3 style="margin-bottom: 14px;">Management Actions</h3>
+        <div class="quick-actions-grid" style="margin-bottom: 28px;">
+          <a href="/admin-customers.html" class="quick-action-card">
+            <div class="quick-action-icon">👥</div>
+            <div>
+              <div class="quick-action-title">Manage Customers</div>
+              <p class="quick-action-desc">Search, view, block/unblock</p>
+            </div>
+          </a>
+          <a href="/admin-loans.html" class="quick-action-card">
+            <div class="quick-action-icon">📑</div>
+            <div>
+              <div class="quick-action-title">Review Loans</div>
+              <p class="quick-action-desc">Approve or reject requests</p>
+            </div>
+          </a>
+          <a href="/admin-transactions.html" class="quick-action-card">
+            <div class="quick-action-icon">💳</div>
+            <div>
+              <div class="quick-action-title">Audit Transactions</div>
+              <p class="quick-action-desc">Trace all movements</p>
+            </div>
+          </a>
+          <a href="/admin-reports.html" class="quick-action-card">
+            <div class="quick-action-icon">📈</div>
+            <div>
+              <div class="quick-action-title">Generate Reports</div>
+              <p class="quick-action-desc">Financial summaries & CSV</p>
+            </div>
+          </a>
+        </div>
+
+        <!-- Recent Activity Section -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Recent System Transactions</h3>
+              <p class="card-subtitle">Real-time ledger audit log across all banking customers</p>
+            </div>
+            <a href="/admin-transactions.html" class="btn btn-outline btn-sm">Full Ledger →</a>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Ref #</th>
+                    <th>Date & Time</th>
+                    <th>Account #</th>
+                    <th>Type</th>
+                    <th style="text-align: right;">Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-recent-txns">
+                  <tr>
+                    <td colspan="6" style="text-align: center; padding: 30px;">
+                      <div class="spinner spinner-sm"></div> Fetching recent ledger records...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>TrustVault Core Banking Administration Console. Confidential & Restricted.</div>
+        <div>Security Protocol Active</div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

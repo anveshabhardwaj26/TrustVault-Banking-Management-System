@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction History | TrustVault</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Secure Banking</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Account Overview</li>
+        <li class="sidebar-item">
+          <a href="/dashboard.html" class="sidebar-link" data-page="dashboard">
+            <span class="icon">📊</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-heading">Fund Operations</li>
+        <li class="sidebar-item">
+          <a href="/deposit.html" class="sidebar-link" data-page="deposit">
+            <span class="icon">📥</span> Deposit Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/withdraw.html" class="sidebar-link" data-page="withdraw">
+            <span class="icon">📤</span> Withdraw Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transfer.html" class="sidebar-link" data-page="transfer">
+            <span class="icon">🔄</span> Fund Transfer
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transactions.html" class="sidebar-link active" data-page="transactions">
+            <span class="icon">📜</span> Transactions
+          </a>
+        </li>
+        <li class="sidebar-heading">Lending</li>
+        <li class="sidebar-item">
+          <a href="/loans.html" class="sidebar-link" data-page="loans">
+            <span class="icon">💳</span> Apply for Loan
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/loan-status.html" class="sidebar-link" data-page="loan-status">
+            <span class="icon">📑</span> Loan Status
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">Transaction History</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar">C</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">Customer</span>
+              <span class="user-role user-role-display">Account Holder</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Account Statement & Transactions</h1>
+            <p class="page-subtitle">Track, filter, and export all debit and credit movements</p>
+          </div>
+          <button type="button" class="btn btn-outline" id="export-csv-btn">
+            📥 Export to CSV
+          </button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="filter-type" style="font-weight: 600; font-size: 0.85rem; color: var(--text-dark);">Type:</label>
+            <select id="filter-type" class="form-select" style="width: auto;">
+              <option value="all">All Types</option>
+              <option value="deposit">Deposit</option>
+              <option value="withdrawal">Withdrawal</option>
+              <option value="transfer">Transfer</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="filter-start-date" style="font-weight: 600; font-size: 0.85rem; color: var(--text-dark);">From:</label>
+            <input type="date" id="filter-start-date" class="form-control" style="width: auto;">
+            
+            <label for="filter-end-date" style="font-weight: 600; font-size: 0.85rem; color: var(--text-dark);">To:</label>
+            <input type="date" id="filter-end-date" class="form-control" style="width: auto;">
+            
+            <button type="button" class="btn btn-primary btn-sm" id="apply-filters-btn">
+              Apply Filter
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" id="reset-filters-btn">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Transactions Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Transaction Records</h3>
+            <span id="record-count" style="font-size: 0.85rem; color: var(--text-light);">Loading records...</span>
+          </div>
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Ref #</th>
+                    <th>Date & Time</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Dr / Cr</th>
+                    <th style="text-align: right;">Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="transactions-table-body">
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px;">
+                      <div class="spinner spinner-sm"></div> Loading transactions...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;" id="pagination-container">
+            <div style="font-size: 0.85rem; color: var(--text-light);" id="pagination-info">
+              Showing page 1
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline btn-sm" id="prev-page-btn" disabled>← Previous</button>
+              <button class="btn btn-outline btn-sm" id="next-page-btn" disabled>Next →</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>© 2026 TrustVault Banking System.</div>
+        <div>Customer Support: 1800-TRUST-VAULT</div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/transactions.js"></script>
+</body>
+</html>

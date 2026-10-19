@@ -1,0 +1,181 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+title TrustVault — System Class Diagram
+
+package "Domain Model Entities" {
+    abstract class User {
+        - id: Integer
+        - fullName: String
+        - email: String
+        - passwordHash: String
+        - phone: String
+        - address: String
+        - role: String
+        - createdAt: DateTime
+        - updatedAt: DateTime
+        + getId(): Integer
+        + getEmail(): String
+        + getRole(): String
+        + verifyPassword(plainPassword: String): Boolean
+    }
+
+    class Customer {
+        - accountNumber: String
+        + viewAccount(): Account
+        + initiateTransfer(recipientAcc: String, amount: Number): Transaction
+        + applyForLoan(loanDetails: Object): LoanApplication
+    }
+
+    class Employee {
+        - employeeId: String
+        + searchCustomer(keyword: String): List<User>
+        + viewAllTransactions(): List<Transaction>
+        + addLoanReviewNotes(loanId: Integer, notes: String): Boolean
+    }
+
+    class Admin {
+        - adminLevel: String
+        + toggleAccountStatus(accId: Integer, status: String): Boolean
+        + adjudicateLoan(loanId: Integer, decision: String, remarks: String): Boolean
+        + generateInstitutionalReport(reportType: String): Object
+    }
+
+    class Account {
+        - id: Integer
+        - userId: Integer
+        - accountNumber: String
+        - accountType: String
+        - balancePaise: Integer
+        - status: String
+        - createdAt: DateTime
+        - updatedAt: DateTime
+        + getBalanceInRupees(): Number
+        + hasSufficientBalance(amountPaise: Integer): Boolean
+        + isActive(): Boolean
+    }
+
+    class Transaction {
+        - id: Integer
+        - referenceId: String
+        - senderAccountId: Integer
+        - recipientAccountId: Integer
+        - transactionType: String
+        - amountPaise: Integer
+        - balanceAfterPaise: Integer
+        - status: String
+        - description: String
+        - createdAt: DateTime
+        + getAmountInRupees(): Number
+        + isSuccessful(): Boolean
+    }
+
+    class LoanApplication {
+        - id: Integer
+        - userId: Integer
+        - loanType: String
+        - amountPaise: Integer
+        - tenureMonths: Integer
+        - monthlyIncomePaise: Integer
+        - purpose: String
+        - status: String
+        - adminRemarks: String
+        - decisionDate: DateTime
+        - createdAt: DateTime
+        + getAmountInRupees(): Number
+        + isPending(): Boolean
+    }
+}
+
+package "Service Layer" {
+    class AuthenticationService {
+        - userRepo: UserRepository
+        - accountRepo: AccountRepository
+        + register(userData: Object): Object
+        + login(email: String, plainPassword: String): Object
+        + logout(session: Object): Boolean
+    }
+
+    class AccountService {
+        - accountRepo: AccountRepository
+        + getAccountDetails(userId: Integer): Account
+        + getBalance(userId: Integer): Number
+    }
+
+    class TransactionService {
+        - accountRepo: AccountRepository
+        - transactionRepo: TransactionRepository
+        + deposit(userId: Integer, amountRupees: Number): Transaction
+        + withdraw(userId: Integer, amountRupees: Number): Transaction
+        + transfer(senderUserId: Integer, recipientAccNum: String, amountRupees: Number, remark: String): Transaction
+        + getHistory(userId: Integer, filter: Object): List<Transaction>
+    }
+
+    class LoanService {
+        - loanRepo: LoanRepository
+        + submitApplication(userId: Integer, loanData: Object): LoanApplication
+        + getCustomerLoans(userId: Integer): List<LoanApplication>
+        + adjudicateLoan(loanId: Integer, decision: String, remarks: String): Boolean
+    }
+}
+
+package "Data Access Layer (Repositories)" {
+    class UserRepository {
+        + findById(id: Integer): User
+        + findByEmail(email: String): User
+        + create(userData: Object): User
+        + findAllCustomers(): List<User>
+    }
+
+    class AccountRepository {
+        + findByUserId(userId: Integer): Account
+        + findByAccountNumber(accNum: String): Account
+        + create(accountData: Object): Account
+        + incrementBalance(accountId: Integer, amountPaise: Integer): Boolean
+        + decrementBalance(accountId: Integer, amountPaise: Integer): Boolean
+        + updateStatus(accountId: Integer, newStatus: String): Boolean
+    }
+
+    class TransactionRepository {
+        + create(txData: Object): Transaction
+        + findByAccountId(accId: Integer, options: Object): List<Transaction>
+        + findAll(options: Object): List<Transaction>
+        + getAggregateVolume(): Object
+    }
+
+    class LoanRepository {
+        + create(loanData: Object): LoanApplication
+        + findByUserId(userId: Integer): List<LoanApplication>
+        + findById(id: Integer): LoanApplication
+        + findAll(): List<LoanApplication>
+        + updateDecision(id: Integer, status: String, remarks: String): Boolean
+    }
+}
+
+' Inheritance
+Customer --|> User
+Employee --|> User
+Admin --|> User
+
+' Entity Associations
+User "1" -- "1" Account : owns >
+Account "1" -- "0..*" Transaction : participates in >
+User "1" -- "0..*" LoanApplication : applies for >
+
+' Service to Repository Dependencies
+AuthenticationService ..> UserRepository : uses
+AuthenticationService ..> AccountRepository : uses
+AccountService ..> AccountRepository : uses
+TransactionService ..> AccountRepository : uses
+TransactionService ..> TransactionRepository : uses
+LoanService ..> LoanRepository : uses
+
+' Service to Domain Entity Dependencies
+TransactionService ..> Transaction : creates
+LoanService ..> LoanApplication : creates / updates
+
+@enduml

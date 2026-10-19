@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Financial Reports & Analytics | TrustVault Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Admin Console</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Overview</li>
+        <li class="sidebar-item">
+          <a href="/admin.html" class="sidebar-link" data-page="admin-dashboard">
+            <span class="icon">📊</span> Admin Overview
+          </a>
+        </li>
+        <li class="sidebar-heading">Management</li>
+        <li class="sidebar-item">
+          <a href="/admin-customers.html" class="sidebar-link" data-page="admin-customers">
+            <span class="icon">👥</span> Customer Accounts
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin-transactions.html" class="sidebar-link" data-page="admin-transactions">
+            <span class="icon">💳</span> All Transactions
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin-loans.html" class="sidebar-link" data-page="admin-loans">
+            <span class="icon">📑</span> Loan Approvals
+          </a>
+        </li>
+        <li class="sidebar-heading">Intelligence</li>
+        <li class="sidebar-item">
+          <a href="/admin-reports.html" class="sidebar-link active" data-page="admin-reports">
+            <span class="icon">📈</span> Financial Reports
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">Financial Intelligence & Executive Summary</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar" style="background-color: var(--accent);">A</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">System Administrator</span>
+              <span class="user-role user-role-display">Super Admin</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Executive Banking Report</h1>
+            <p class="page-subtitle" id="report-timestamp">Generated on: Calculating...</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-outline btn-sm" id="refresh-reports-btn">
+              🔄 Refresh Analytics
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="export-reports-btn">
+              📥 Export Report as CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Summary Stat Cards -->
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+          <div class="stat-card">
+            <div class="stat-icon primary">👥</div>
+            <div class="stat-content">
+              <div class="stat-value" id="report-total-customers">0</div>
+              <div class="stat-label">Total Customers Registered</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon info">🏦</div>
+            <div class="stat-content">
+              <div class="stat-value" id="report-total-accounts">0</div>
+              <div class="stat-label">Total Active Bank Accounts</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon success">📥</div>
+            <div class="stat-content">
+              <div class="stat-value" id="report-total-deposits">₹0.00</div>
+              <div class="stat-label">Total Inflow / Deposits</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon danger">📤</div>
+            <div class="stat-content">
+              <div class="stat-value" id="report-total-withdrawals">₹0.00</div>
+              <div class="stat-label">Total Outflow / Withdrawals</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon accent">🔄</div>
+            <div class="stat-content">
+              <div class="stat-value" id="report-successful-transfers">0</div>
+              <div class="stat-label">Total Successful Transfers</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon warning">⚖️</div>
+            <div class="stat-content">
+              <div class="stat-value" id="report-pending-loans">0</div>
+              <div class="stat-label">Pending Loan Applications</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Breakdown Card -->
+        <div class="card" style="margin-top: 24px;">
+          <div class="card-header">
+            <h3 class="card-title">Liquidity & System Totals</h3>
+            <span class="badge badge-info">Audited Real-Time</span>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Metric / Metric Category</th>
+                    <th>Value / Quantitative Measure</th>
+                    <th>Status / Assessment</th>
+                  </tr>
+                </thead>
+                <tbody id="report-details-tbody">
+                  <tr>
+                    <td colspan="3" style="text-align: center; padding: 30px;">
+                      <div class="spinner spinner-sm"></div> Compiling financial analytics...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>TrustVault Core Banking Administration Console.</div>
+        <div>Executive Reporting Division</div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

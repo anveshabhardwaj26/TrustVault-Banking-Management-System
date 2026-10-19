@@ -1,0 +1,86 @@
+@startuml
+skinparam roundcorner 10
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam rectangle {
+    BackgroundColor #E8F0FE
+    BorderColor #1A73E8
+}
+
+skinparam component {
+    BackgroundColor #FEF7E0
+    BorderColor #B06000
+    RoundCorner 20
+}
+
+skinparam database {
+    BackgroundColor #FCE8E6
+    BorderColor #C5221F
+}
+
+title Data Flow Diagram Level 1 — TrustVault Functional Processes & Stores
+
+' External Entities
+rectangle "External Entity:\n<b>Customer</b>" as Customer
+rectangle "External Entity:\n<b>Bank Manager / Admin</b>" as Manager
+
+' Processes
+component "<b>1.0</b>\nManage Authentication\n& Sessions" as P1
+component "<b>2.0</b>\nManage Accounts\n& Profiles" as P2
+component "<b>3.0</b>\nManage Transactions\n(Deposit/Withdraw/Transfer)" as P3
+component "<b>4.0</b>\nManage Loans\n(Application & Approval)" as P4
+component "<b>5.0</b>\nGenerate Reports\n& Institutional Metrics" as P5
+
+' Data Stores
+database "<b>D1</b>: User Data\n(users table)" as D1
+database "<b>D2</b>: Account Data\n(accounts table)" as D2
+database "<b>D3</b>: Transaction Data\n(transactions table)" as D3
+database "<b>D4</b>: Loan Data\n(loan_applications table)" as D4
+database "<b>D5</b>: Audit Data\n(audit_logs table)" as D5
+
+' --- Process 1.0 Authentication ---
+Customer --> P1 : Registration Info / Login Credentials
+Manager --> P1 : Admin Credentials
+P1 --> Customer : Session Cookie / Auth Status
+P1 --> Manager : Admin Session Token
+P1 --> D1 : Write User Credentials / Query Hash
+D1 --> P1 : Read Stored Password Hash & Role
+P1 --> D5 : Log Login / Logout Events
+
+' --- Process 2.0 Accounts ---
+Customer --> P2 : Request Balance & Account Details
+Manager --> P2 : Account State Change (Freeze/Unfreeze)
+P2 --> Customer : Render Account Details & Balance (₹)
+P2 --> Manager : Customer Profile & Status Response
+P1 --> P2 : Trigger Auto-Account Creation (On Register)
+P2 <--> D2 : Read / Update Account Status & Balance
+P2 --> D5 : Log Account Status Modification
+
+' --- Process 3.0 Transactions ---
+Customer --> P3 : Deposit / Withdrawal / Transfer Request
+P3 --> Customer : Transaction Receipt / Debit Advice
+P3 <--> D2 : Read Balance / Update Balances in Paise
+P3 --> D3 : Record Immutable Transaction Record
+P3 --> D5 : Log High-Value or Failed Actions
+D3 --> P3 : Read Transaction History for Customer
+
+' --- Process 4.0 Loans ---
+Customer --> P4 : Submit Loan Application (Category, Principal, Income)
+Manager --> P4 : Review Notes & Approval/Rejection Verdict
+P4 --> Customer : Loan Application Status & Notes
+P4 --> Manager : Pending Loan Queue & Income Ratios
+P4 <--> D4 : Create Application / Update Decision State
+P4 --> D5 : Log Loan Decision Audit Trail
+
+' --- Process 5.0 Reports ---
+Manager --> P5 : Query Dashboard KPIs & System Reports
+P5 --> Manager : Deliver Aggregate Institutional Metrics
+D1 --> P5 : Total User Counts
+D2 --> P5 : Total Deposit Sums & Account States
+D3 --> P5 : System Volume & Throughput Metrics
+D4 --> P5 : Loan Distribution Statistics
+D5 --> P5 : Compliance Audit Trail Entries
+
+@enduml

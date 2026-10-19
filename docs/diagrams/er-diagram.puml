@@ -1,0 +1,84 @@
+@startuml
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam classAttributeIconSize 0
+
+title TrustVault — Entity-Relationship Diagram (ERD)
+
+entity "users" as users {
+    * **id** : INTEGER <<PK, AUTOINCREMENT>>
+    --
+    * full_name : TEXT
+    * email : TEXT <<UNIQUE>>
+    * password_hash : TEXT
+    * phone : TEXT <<UNIQUE>>
+    * address : TEXT
+    * role : TEXT <<'customer' | 'employee' | 'admin'>>
+    * created_at : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+    * updated_at : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+}
+
+entity "accounts" as accounts {
+    * **id** : INTEGER <<PK, AUTOINCREMENT>>
+    --
+    * user_id : INTEGER <<FK, UNIQUE>>
+    * account_number : TEXT <<UNIQUE>>
+    * account_type : TEXT <<'SAVINGS' | 'CURRENT'>>
+    * balance : INTEGER <<paise: 1 INR = 100 paise, DEFAULT 0>>
+    * status : TEXT <<'ACTIVE' | 'BLOCKED' | 'CLOSED'>>
+    * created_at : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+    * updated_at : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+}
+
+entity "transactions" as transactions {
+    * **id** : INTEGER <<PK, AUTOINCREMENT>>
+    --
+    * reference_id : TEXT <<UNIQUE>>
+    sender_account_id : INTEGER <<FK, NULLABLE>>
+    recipient_account_id : INTEGER <<FK, NULLABLE>>
+    * transaction_type : TEXT <<'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER'>>
+    * amount : INTEGER <<paise: non-negative integer>>
+    * balance_after : INTEGER <<paise: acting account balance>>
+    * status : TEXT <<'SUCCESS' | 'FAILED'>>
+    description : TEXT <<NULLABLE>>
+    * created_at : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+}
+
+entity "loan_applications" as loan_applications {
+    * **id** : INTEGER <<PK, AUTOINCREMENT>>
+    --
+    * user_id : INTEGER <<FK>>
+    * loan_type : TEXT <<'PERSONAL' | 'HOME' | 'EDUCATION'>>
+    * amount : INTEGER <<paise: principal amount>>
+    * tenure_months : INTEGER
+    * monthly_income : INTEGER <<paise>>
+    * purpose : TEXT
+    * status : TEXT <<'PENDING' | 'APPROVED' | 'REJECTED'>>
+    admin_remarks : TEXT <<NULLABLE>>
+    decision_date : DATETIME <<NULLABLE>>
+    * created_at : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+}
+
+entity "audit_logs" as audit_logs {
+    * **id** : INTEGER <<PK, AUTOINCREMENT>>
+    --
+    * user_id : INTEGER <<FK>>
+    * action : TEXT <<e.g., 'LOAN_DECISION', 'STATUS_CHANGE'>>
+    * entity_type : TEXT <<'accounts' | 'loan_applications'>>
+    * entity_id : INTEGER
+    details : TEXT <<JSON string of state changes>>
+    ip_address : TEXT <<NULLABLE>>
+    * created_at : DATETIME <<DEFAULT CURRENT_TIMESTAMP>>
+}
+
+' Cardinality Relationships
+users ||--|| accounts : "1-to-1 (user owns account)"
+users ||--o{ loan_applications : "1-to-many (user submits loans)"
+users ||--o{ audit_logs : "1-to-many (user generates audit logs)"
+
+accounts ||--o{ transactions : "1-to-many (sender_account_id)"
+accounts ||--o{ transactions : "1-to-many (recipient_account_id)"
+
+@enduml

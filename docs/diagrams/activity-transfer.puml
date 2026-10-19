@@ -1,0 +1,107 @@
+@startuml
+skinparam roundcorner 10
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+title TrustVault — Fund Transfer Workflow (Activity Diagram)
+
+|Customer|
+start
+:Access Fund Transfer Page;
+:Input Recipient Account Number, Amount (₹), and Remark;
+:Submit Transfer Form;
+
+|Express API Server|
+:Receive POST /api/transactions/transfer;
+:Verify Authenticated Session Cookie;
+
+if (Session Valid & Active?) then (No)
+    :Return 401 Unauthorized;
+    |Customer|
+    :Display Session Expired Alert;
+    :Redirect to Login Screen;
+    stop
+else (Yes)
+    |Express API Server|
+    :Extract Sender User ID;
+    :Query Sender Account in SQLite;
+endif
+
+if (Sender Account Found & Active?) then (No)
+    :Return 403 Forbidden;
+    |Customer|
+    :Display Account Suspended Alert;
+    stop
+else (Yes)
+    |Express API Server|
+    :Validate Input Fields (Amount > 0, Account Format);
+endif
+
+if (Sender Account == Recipient Account?) then (Yes)
+    :Reject Self-Transfer (BR-09);
+    :Return 400 Bad Request;
+    |Customer|
+    :Display "Cannot transfer to own account" Error;
+    stop
+else (No)
+    |Express API Server|
+    :Query Recipient Account (by Account Number);
+endif
+
+if (Recipient Account Exists & is Active?) then (No)
+    :Return 404 / 400 Beneficiary Invalid (BR-10);
+    |Customer|
+    :Display "Invalid or Inactive Beneficiary" Error;
+    stop
+else (Yes)
+    |Express API Server|
+    :Validate Amount Bounds (₹100 <= Amount <= ₹2,00,000);
+endif
+
+if (Amount Within Allowed Limits?) then (No)
+    :Return 400 Limit Exceeded (BR-13);
+    |Customer|
+    :Display "Amount out of allowable bounds" Error;
+    stop
+else (Yes)
+    |Express API Server|
+    :Convert Amount to Integer Paise;
+    :Check Sender Available Balance;
+endif
+
+if (Sender Balance >= Transfer Amount?) then (No)
+    :Return 400 Insufficient Funds (BR-11);
+    |Customer|
+    :Display "Insufficient Funds" Warning;
+    stop
+else (Yes)
+    |SQLite Database|
+    :Execute BEGIN IMMEDIATE Transaction;
+    :Debit Sender Account Balance (Paise);
+    :Credit Recipient Account Balance (Paise);
+    :Insert Transaction Audit Record;
+endif
+
+if (Database Operations Succeeded?) then (Yes)
+    |SQLite Database|
+    :COMMIT Transaction;
+    |Express API Server|
+    :Generate Reference ID;
+    :Send 200 OK with New Balance & Receipt;
+    |Customer|
+    :Render Electronic Transfer Advice Receipt;
+    :Update Displayed Dashboard Balance;
+    stop
+else (No)
+    |SQLite Database|
+    :ROLLBACK Transaction (Zero Balance Changes);
+    |Express API Server|
+    :Log Internal SQL Error;
+    :Send 500 Internal Server Error;
+    |Customer|
+    :Display "Transfer Failed - Funds Restored" Alert;
+    stop
+endif
+
+@enduml

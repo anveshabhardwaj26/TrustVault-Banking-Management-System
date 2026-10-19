@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deposit Funds | TrustVault</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Secure Banking</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Account Overview</li>
+        <li class="sidebar-item">
+          <a href="/dashboard.html" class="sidebar-link" data-page="dashboard">
+            <span class="icon">📊</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-heading">Fund Operations</li>
+        <li class="sidebar-item">
+          <a href="/deposit.html" class="sidebar-link active" data-page="deposit">
+            <span class="icon">📥</span> Deposit Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/withdraw.html" class="sidebar-link" data-page="withdraw">
+            <span class="icon">📤</span> Withdraw Funds
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transfer.html" class="sidebar-link" data-page="transfer">
+            <span class="icon">🔄</span> Fund Transfer
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/transactions.html" class="sidebar-link" data-page="transactions">
+            <span class="icon">📜</span> Transactions
+          </a>
+        </li>
+        <li class="sidebar-heading">Lending</li>
+        <li class="sidebar-item">
+          <a href="/loans.html" class="sidebar-link" data-page="loans">
+            <span class="icon">💳</span> Apply for Loan
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/loan-status.html" class="sidebar-link" data-page="loan-status">
+            <span class="icon">📑</span> Loan Status
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">Deposit Money</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar">C</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">Customer</span>
+              <span class="user-role user-role-display">Account Holder</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Deposit Funds</h1>
+            <p class="page-subtitle">Add money directly into your TrustVault savings account</p>
+          </div>
+          <a href="/dashboard.html" class="btn btn-outline btn-sm">← Back to Dashboard</a>
+        </div>
+
+        <div style="max-width: 650px; margin: 0 auto;">
+          <!-- Current Balance Card -->
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-body" style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 0.85rem; color: var(--text-light); text-transform: uppercase; font-weight: 600;">Current Available Balance</div>
+                <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary);" id="current-balance">₹0.00</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.82rem; color: var(--text-light);">Account Number</div>
+                <div style="font-weight: 600; color: var(--text-dark);" id="account-number-display">••••••••••••</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Deposit Form Card -->
+          <div class="card" id="deposit-card">
+            <div class="card-header">
+              <h3 class="card-title">Deposit Details</h3>
+            </div>
+            <div class="card-body">
+              <div id="deposit-error-box" class="inline-alert inline-alert-error" style="display: none;">
+                <span id="deposit-error-msg"></span>
+              </div>
+
+              <form id="deposit-form" novalidate>
+                <div class="form-group">
+                  <label for="amount" class="form-label">Deposit Amount (₹) <span class="required">*</span></label>
+                  <div class="input-group">
+                    <span class="input-prefix">₹</span>
+                    <input 
+                      type="number" 
+                      id="amount" 
+                      name="amount" 
+                      class="form-control" 
+                      placeholder="e.g. 5000" 
+                      min="1" 
+                      step="any"
+                      required
+                    >
+                  </div>
+                  <div class="form-error" id="amount-error">Please enter a valid deposit amount greater than ₹0.</div>
+                  <div class="form-hint">Minimum deposit is ₹1.00.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="description" class="form-label">Description / Remarks (Optional)</label>
+                  <input 
+                    type="text" 
+                    id="description" 
+                    name="description" 
+                    class="form-control" 
+                    placeholder="e.g. Salary, Client payment, Savings"
+                    maxlength="100"
+                  >
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 28px;">
+                  <button type="submit" class="btn btn-primary btn-lg" style="flex: 2;" id="submit-deposit-btn">
+                    Proceed to Deposit
+                  </button>
+                  <a href="/dashboard.html" class="btn btn-outline btn-lg" style="flex: 1; text-align: center;">
+                    Cancel
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Success Receipt Box (Hidden until deposit succeeds) -->
+          <div class="card" id="success-card" style="display: none;">
+            <div class="card-body" style="text-align: center; padding: 40px 24px;">
+              <div style="width: 60px; height: 60px; background-color: var(--success-bg); color: var(--success); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 16px;">
+                ✓
+              </div>
+              <h2 style="color: var(--success); margin-bottom: 8px;">Deposit Successful!</h2>
+              <p style="color: var(--text-light); margin-bottom: 24px;">Funds have been credited to your account.</p>
+
+              <div class="summary-box" style="text-align: left; max-width: 440px; margin: 0 auto 24px;">
+                <div class="summary-row">
+                  <span class="summary-label">Reference ID</span>
+                  <span class="summary-value" id="receipt-ref">—</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Amount Deposited</span>
+                  <span class="summary-value highlight" id="receipt-amount">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">New Balance</span>
+                  <span class="summary-value" id="receipt-balance">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                  <span class="summary-label">Date & Time</span>
+                  <span class="summary-value" id="receipt-time">—</span>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: center; gap: 12px;">
+                <button type="button" class="btn btn-outline" id="deposit-again-btn">Make Another Deposit</button>
+                <a href="/dashboard.html" class="btn btn-primary">Go to Dashboard</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>© 2026 TrustVault Banking System.</div>
+        <div>Customer Support: 1800-TRUST-VAULT</div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Deposit Confirmation Modal -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Deposit</h3>
+        <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px; color: var(--text-dark);">
+          Please review the details below before confirming your deposit:
+        </p>
+        <div class="summary-box">
+          <div class="summary-row">
+            <span class="summary-label">Deposit Amount:</span>
+            <span class="summary-value highlight" id="modal-amount">₹0.00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Description:</span>
+            <span class="summary-value" id="modal-desc">None</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Credit To:</span>
+            <span class="summary-value" id="modal-target-account">Your Account</span>
+          </div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-light); margin: 0;">
+          Are you sure you want to proceed with this deposit?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="modal-cancel-btn">Cancel</button>
+        <button type="button" class="btn btn-success" id="modal-confirm-btn">Confirm & Deposit</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/deposit.js"></script>
+</body>
+</html>

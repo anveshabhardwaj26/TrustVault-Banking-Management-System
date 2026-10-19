@@ -1,0 +1,68 @@
+@startuml
+skinparam roundcorner 10
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+skinparam packageStyle rectangle
+
+title TrustVault Banking Management System — 4-Layer Architecture Diagram
+
+package "Layer 1: Presentation Layer (public/)" {
+    [Web Browser Client\n(Desktop / Tablet Viewports)] as Browser
+    [HTML5 Dynamic Pages\n(index, dashboard, transfer, loans, admin...)] as HTMLPages
+    [Modular CSS3 Styles\n(css/styles.css)] as CSS
+    [Frontend JS Client Controller\n(js/api.js, js/auth.js, js/transfer.js...)] as JSApp
+}
+
+package "Layer 2: Business Logic Layer (src/)" {
+    [HTTP Route Dispatchers\n(src/routes/*)] as Routes
+    [Security & Auth Middleware\n(src/middleware/auth.js)] as AuthMiddleware
+    [Application Controllers\n(src/controllers/*)] as Controllers
+    [Domain Business Rule Services\n(src/services/*)] as Services
+    [Validation & Formatting Utilities\n(src/utils/*)] as Utils
+}
+
+package "Layer 3: Data Access Layer (src/repositories/)" {
+    [User Repository\n(userRepository.js)] as UserRepo
+    [Account Repository\n(accountRepository.js)] as AccountRepo
+    [Transaction Repository\n(transactionRepository.js)] as TxnRepo
+    [Loan Repository\n(loanRepository.js)] as LoanRepo
+    [Audit Repository\n(auditRepository.js)] as AuditRepo
+}
+
+package "Layer 4: Database Layer (data/)" {
+    database "SQLite 3 Engine\n(better-sqlite3 Driver / WAL Mode)" as SQLiteDriver
+    file "data/trustvault.db\n(users, accounts, transactions, loans, audit_logs)" as DBStorage
+}
+
+' Layer 1 Connections
+Browser --> HTMLPages : Renders
+HTMLPages ..> CSS : Styled By
+HTMLPages --> JSApp : User Interaction Events
+
+' Layer 1 to Layer 2 Transition
+JSApp ..> Routes : HTTP REST Calls (JSON Payloads / Cookies)
+
+' Layer 2 Internal Flow
+Routes --> AuthMiddleware : Route Interception & Session Guard
+AuthMiddleware --> Controllers : Pass Sanitized Request
+Controllers --> Services : Invoke Domain Methods
+Services ..> Utils : Currency Conversion (Paise <-> ₹)
+
+' Layer 2 to Layer 3 Transition
+Services --> UserRepo : Query / Persist Users
+Services --> AccountRepo : Atomically Modify Balances
+Services --> TxnRepo : Record Financial Movements
+Services --> LoanRepo : Manage Loan Lifecycle
+Services --> AuditRepo : Write Governance Audits
+
+' Layer 3 to Layer 4 Transition
+UserRepo ..> SQLiteDriver : Parameterized SQL Statements
+AccountRepo ..> SQLiteDriver : Parameterized SQL Statements
+TxnRepo ..> SQLiteDriver : Parameterized SQL Statements
+LoanRepo ..> SQLiteDriver : Parameterized SQL Statements
+AuditRepo ..> SQLiteDriver : Parameterized SQL Statements
+
+SQLiteDriver --> DBStorage : Synchronous File Read / Write (WAL)
+
+@enduml

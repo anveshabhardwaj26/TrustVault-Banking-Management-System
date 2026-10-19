@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Management | TrustVault Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Admin Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-info">
+          <span class="brand-title">TrustVault</span>
+          <span class="brand-tagline">Admin Console</span>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-heading">Overview</li>
+        <li class="sidebar-item">
+          <a href="/admin.html" class="sidebar-link" data-page="admin-dashboard">
+            <span class="icon">📊</span> Admin Overview
+          </a>
+        </li>
+        <li class="sidebar-heading">Management</li>
+        <li class="sidebar-item">
+          <a href="/admin-customers.html" class="sidebar-link active" data-page="admin-customers">
+            <span class="icon">👥</span> Customer Accounts
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin-transactions.html" class="sidebar-link" data-page="admin-transactions">
+            <span class="icon">💳</span> All Transactions
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/admin-loans.html" class="sidebar-link" data-page="admin-loans">
+            <span class="icon">📑</span> Loan Approvals
+          </a>
+        </li>
+        <li class="sidebar-heading">Intelligence</li>
+        <li class="sidebar-item">
+          <a href="/admin-reports.html" class="sidebar-link" data-page="admin-reports">
+            <span class="icon">📈</span> Financial Reports
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link logout-btn" style="color: #ff7675;">
+          <span class="icon">🚪</span> Sign Out
+        </a>
+      </div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h2 class="navbar-page-title">Customer Account Management</h2>
+        </div>
+        <div class="navbar-right">
+          <div class="user-badge">
+            <div class="user-avatar" style="background-color: var(--accent);">A</div>
+            <div class="user-details">
+              <span class="user-name user-name-display">System Administrator</span>
+              <span class="user-role user-role-display">Super Admin</span>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm logout-btn" style="margin-left: 10px;">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Customer Accounts Directory</h1>
+            <p class="page-subtitle">Search, inspect account balances, and manage access restrictions</p>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" id="refresh-customers-btn">
+            🔄 Refresh List
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="filter-bar">
+          <div class="search-input-wrapper" style="flex: 1; max-width: 480px;">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              id="customer-search-input" 
+              class="form-control" 
+              placeholder="Search by customer name, email, phone, or account number..."
+            >
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-light);" id="customer-count-label">
+            Loading customers...
+          </div>
+        </div>
+
+        <!-- Customers Table Card -->
+        <div class="card">
+          <div class="card-body" style="padding: 0;">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Customer Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Account #</th>
+                    <th>Type</th>
+                    <th style="text-align: right;">Balance</th>
+                    <th>Status</th>
+                    <th style="text-align: center;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customers-table-tbody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 40px;">
+                      <div class="spinner spinner-sm"></div> Fetching customers directory...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div>TrustVault Core Banking Administration Console.</div>
+        <div>Confidential Bank Records</div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Customer Detail Modal -->
+  <div class="modal-overlay" id="customer-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Customer Profile & Account Details</h3>
+        <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="summary-box">
+          <div class="summary-row">
+            <span class="summary-label">Full Name:</span>
+            <span class="summary-value" id="modal-cust-name">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Email Address:</span>
+            <span class="summary-value" id="modal-cust-email">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Phone Number:</span>
+            <span class="summary-value" id="modal-cust-phone">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Account Number:</span>
+            <span class="summary-value" id="modal-cust-account">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Account Type:</span>
+            <span class="summary-value" id="modal-cust-type">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Current Balance:</span>
+            <span class="summary-value highlight" id="modal-cust-balance">₹0.00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Account Status:</span>
+            <span class="summary-value" id="modal-cust-status">—</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+          <label for="change-status-select" class="form-label">Change Account Status</label>
+          <select id="change-status-select" class="form-select">
+            <option value="ACTIVE">ACTIVE (Normal Operations)</option>
+            <option value="FROZEN">FROZEN (Temporarily Suspended)</option>
+            <option value="BLOCKED">BLOCKED (Access Denied)</option>
+          </select>
+          <div class="form-hint">Selecting FROZEN or BLOCKED will prevent the customer from executing withdrawals and transfers.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="modal-dismiss-btn">Close</button>
+        <button type="button" class="btn btn-primary" id="modal-save-status-btn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

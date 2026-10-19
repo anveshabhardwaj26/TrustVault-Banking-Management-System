@@ -1,0 +1,48 @@
+@startuml
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+title TrustVault — Account Lifecycle State Diagram
+
+[*] --> NewAccount : Customer completes registration (FR-01)
+
+state NewAccount {
+    NewAccount : Unique TV-prefixed number assigned
+    NewAccount : Initial ledger balance set to ₹0.00 (0 paise)
+    NewAccount : Awaiting automated verification
+}
+
+NewAccount --> Active : Initialization & verification complete\n[Default state set]
+
+state Active {
+    Active : Deposits permitted (BR-05)
+    Active : Withdrawals permitted (BR-06, BR-08)
+    Active : Inward and Outward transfers permitted (BR-10, BR-11)
+    Active : Loan applications permitted (BR-15)
+}
+
+Active --> Blocked : Admin initiates freeze [FR-16]\n[Suspicious activity / Policy breach]
+
+state Blocked {
+    Blocked : Monetary debits completely restricted
+    Blocked : Outward transfers rejected (BR-14)
+    Blocked : Inward credits rejected (BR-10)
+    Blocked : Read-only balance inspection permitted
+}
+
+Blocked --> Active : Admin unblocks account [FR-16]\n[Security review cleared / identity confirmed]
+
+Active --> Closed : Account closure executed [FR-16]\n[Balance must be exactly ₹0.00]
+Blocked --> Closed : Admin issues permanent closure\n[Disputed balance reconciled]
+
+state Closed {
+    Closed : Account permanently decommissioned
+    Closed : All financial operations prohibited
+    Closed : Historical transaction ledger preserved for auditing
+}
+
+Closed --> [*] : Archived in cold storage
+
+@enduml

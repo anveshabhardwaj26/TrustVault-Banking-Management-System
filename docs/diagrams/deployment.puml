@@ -1,0 +1,46 @@
+@startuml
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 11
+
+skinparam node {
+    BackgroundColor #F8F9FA
+    BorderColor #5F6368
+}
+
+title TrustVault — Deployment & Physical Topology Diagram
+
+node "User's Client Workstation" <<device>> as ClientDevice {
+    node "Web Browser Environment\n(Chrome / Edge / Firefox)" as BrowserNode {
+        artifact "TrustVault Web Frontend\n(HTML5, CSS3, Vanilla JS)" as FrontendApp
+    }
+}
+
+node "Host Workstation / Local Development Machine" <<device>> as ServerDevice {
+    
+    node "Static File Server\n(Express Static Middleware)" as StaticServer {
+        artifact "Web Asset Bundle\n(public/*.html, css/*.css, js/*.js)" as StaticFiles
+    }
+
+    node "Node.js Execution Runtime (v18+ LTS)" as NodeRuntime {
+        component "Express.js Application Server\n(Port :3000)" as ExpressServer {
+            artifact "TrustVault Application Code\n(Routes, Controllers, Services)" as AppCore
+            artifact "better-sqlite3 Native Addon\n(C++ SQLite Bindings)" as SQLiteAddon
+        }
+    }
+
+    node "File System Storage Subsystem" as FileSystem {
+        file "data/trustvault.db\n(SQLite Relational Database & WAL Journal)" as DBFile
+        file "data/sessions.sqlite\n(connect-sqlite3 Persistent Session Store)" as SessionStoreFile
+    }
+}
+
+FrontendApp <..> StaticFiles : 1. Static Asset Retrieval\n(HTTP/1.1 GET over TCP/IP :3000)
+FrontendApp <..> AppCore : 2. Asynchronous REST API Calls\n(HTTP/1.1 POST/GET/PATCH with JSON & Cookies)
+
+AppCore --> SQLiteAddon : In-Process Function Invocations
+SQLiteAddon --> DBFile : Direct Synchronous File I/O\n(Atomic Writes & WAL)
+AppCore --> SessionStoreFile : Session State Serialization
+
+@enduml

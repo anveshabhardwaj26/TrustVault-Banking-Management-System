@@ -1,0 +1,75 @@
+@startuml
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam defaultFontName "Segoe UI"
+skinparam defaultFontSize 12
+
+title TrustVault — User Banking Session Lifecycle (State Machine Diagram)
+
+[*] --> LoggedOut : System Initialized
+
+state LoggedOut {
+    LoggedOut : No active session cookie
+    LoggedOut : Protected routes blocked
+}
+
+LoggedOut --> Authenticating : Submit login credentials [email, password]
+
+state Authenticating {
+    Authenticating : Verifying password with bcrypt
+    Authenticating : Checking user active status
+}
+
+Authenticating --> LoggedOut : [Invalid credentials or account suspended] / Show Error
+Authenticating --> LoggedIn : [Credentials verified] / Issue session cookie & load profile
+
+state LoggedIn {
+    LoggedIn : Session active (connect.sid)
+    LoggedIn : Inactivity timer set to 15 minutes
+}
+
+LoggedIn --> SelectingService : Navigate portal dashboard
+
+state SelectingService {
+    SelectingService : User chooses banking feature
+    SelectingService : (Deposit / Withdraw / Transfer / Loan / History)
+}
+
+SelectingService --> ProcessingTransaction : Submit transaction form [Amount, Beneficiary]
+
+state ProcessingTransaction {
+    ProcessingTransaction : Validating business constraints
+    ProcessingTransaction : Checking available balance
+    ProcessingTransaction : Executing SQLite atomic transaction
+}
+
+ProcessingTransaction --> TransactionSuccessful : [Validation passes & DB commits]
+ProcessingTransaction --> TransactionFailed : [Validation fails OR DB rollback occurs]
+
+state TransactionSuccessful {
+    TransactionSuccessful : Electronic receipt generated
+    TransactionSuccessful : Balance updated in ledger
+}
+
+state TransactionFailed {
+    TransactionFailed : Rejection reason captured
+    TransactionFailed : Balances fully restored
+}
+
+TransactionSuccessful --> SelectingService : Acknowledge receipt / choose next action
+TransactionFailed --> SelectingService : View error notice / retry operation
+
+SelectingService --> LoggingOut : User clicks "Sign Out"
+SelectingService --> LoggingOut : [Inactivity period > 15 minutes] (Session Timeout)
+LoggedIn --> LoggingOut : [Explicit Logout or Inactivity]
+
+state LoggingOut {
+    LoggingOut : Destroy session in connect-sqlite3
+    LoggingOut : Clear connect.sid cookie header
+}
+
+LoggingOut --> LoggedOut : Invalidation complete / Redirect to Login
+
+LoggedOut --> [*] : Browser Closed / Process Terminated
+
+@enduml
